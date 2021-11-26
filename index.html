@@ -1,0 +1,182 @@
+<html>
+  <head>
+    <style>
+      .board {
+        display: flex;
+      }
+      .container {
+        flex: 5;
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .container.active {
+        background: #f4f4f4;
+      }
+      #team-2 {
+        justify-content: end;
+      }
+      .gap {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .card {
+        width: 120px;
+        height: 200px;
+        margin: 8px;
+        border: solid 5px #ccc;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        user-select: none;
+        font-size: 60px;
+        box-sizing: border-box;
+      }
+      .valid {
+        border-color: #31d589
+      }
+      .invalid {
+        border-color: #f04a38;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="board">
+      <div id="team-1" class="container">
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+      </div>
+      <div class="gap">
+        <div class="card" id="card-deck"></div>
+        <h1 id="valid-word"></h1>
+        <p id="valid-word-definition"></p>
+      </div>
+      <div id="team-2" class="container">
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+        <div class="card placeholder"></div>
+      </div>
+    </div>
+  </body>
+  <script>
+    window.onload = () => {
+      const httpGet = (url) => {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("GET", url, false); // false for synchronous request
+        xmlHttp.send(null);
+        return xmlHttp.responseText;
+      }
+
+      chars = [
+        { letter: 'A', frequency: 85 },
+        { letter: 'B', frequency: 27 },
+        { letter: 'C', frequency: 49 },
+        { letter: 'D', frequency: 33 },
+        { letter: 'E', frequency: 109 },
+        { letter: 'F', frequency: 18 },
+        { letter: 'G', frequency: 26 },
+        { letter: 'H', frequency: 39 },
+        { letter: 'I', frequency: 55 },
+        { letter: 'J', frequency: 2 },
+        { letter: 'K', frequency: 14 },
+        { letter: 'L', frequency: 62 },
+        { letter: 'M', frequency: 28 },
+        { letter: 'N', frequency: 51 },
+        { letter: 'O', frequency: 72 },
+        { letter: 'P', frequency: 26 },
+        { letter: 'Q', frequency: 2 },
+        { letter: 'R', frequency: 84 },
+        { letter: 'S', frequency: 59 },
+        { letter: 'T', frequency: 67 },
+        { letter: 'U', frequency: 34 },
+        { letter: 'V', frequency: 11 },
+        { letter: 'W', frequency: 14 },
+        { letter: 'X', frequency: 2 },
+        { letter: 'Y', frequency: 26 },
+        { letter: 'Z', frequency: 2 }
+      ]
+      frequencySum = chars.reduce((prev, current) => {
+        return { frequency: prev.frequency + current.frequency }
+      })
+      cardDeck = document.getElementById('card-deck')
+      cards = Array.from(document.getElementsByClassName('placeholder'))
+      team1 = true
+      cardDeck.onclick = () => {
+        if (!cardDeck.innerHTML) {
+          team1 = !team1
+          activeTeam = document.getElementById(team1 ? 'team-1' : 'team-2')
+          inactiveTeam = document.getElementById(team1 ? 'team-2' : 'team-1')
+          activeTeam.classList.add('active')
+          inactiveTeam.classList.remove('active')
+          randomIndex = Math.ceil(Math.random() * frequencySum.frequency)
+          tempSum = 0
+          tempChar = ''
+          chars.forEach(char => {
+            tempSum += char.frequency
+            if (tempSum >= randomIndex && !tempChar) {
+              tempChar = char.letter
+            }
+          })
+          cardDeck.innerHTML = tempChar
+        }
+      }
+      cards.forEach(card => {
+        card.onclick = () => {
+          if (cardDeck.innerHTML && card.parentNode.classList.contains('active')) {
+            card.innerHTML = cardDeck.innerHTML
+            cardDeck.innerHTML = ''
+            index = Array.from(card.parentNode.children).indexOf(card)
+            row = Math.floor(index / 5)
+            rowElements = Array.from(card.parentNode.children).slice(row * 5, row * 5 + 5)
+            rowText = ''
+            rowElements.forEach(el => {
+              rowText = rowText.concat(el.innerHTML)
+            })
+
+            if (rowText.length === 5) {
+              word = rowText
+              response = JSON.parse(httpGet(`https://dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=f9144e92-9061-4ab5-b46d-f4d37b23f330`))
+              isValid = typeof response[0] === 'object'
+              rowElements.forEach(el => {
+                el.classList.add(isValid ? 'valid' : 'invalid')
+                el.classList.remove(isValid ? 'invalid' : 'valid')
+              })
+
+              if (isValid) {
+                definition = response[0].shortdef[0]
+                document.getElementById('valid-word').innerHTML = word
+                document.getElementById('valid-word-definition').innerHTML = definition
+              }
+            }
+          }
+        }
+      })
+    }
+  </script>
+</html>

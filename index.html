@@ -22,6 +22,7 @@
         align-items: center;
       }
       .card {
+        position: relative;
         width: 120px;
         height: 200px;
         margin: 8px;
@@ -39,48 +40,54 @@
       .invalid {
         border-color: #f04a38;
       }
+      .point-value {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        font-size: 16px;
+      }
     </style>
   </head>
   <body>
     <div class="board">
       <div id="team-1" class="container">
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
       </div>
       <div class="gap">
-        <div class="card" id="card-deck"></div>
+        <div class="card" id="card-deck"><div class="letter"></div><div class="point-value"></div></div>
         <h1 id="valid-word"></h1>
         <p id="valid-word-definition"></p>
       </div>
       <div id="team-2" class="container">
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
-        <div class="card placeholder"></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
       </div>
     </div>
   </body>
@@ -121,42 +128,54 @@
         { letter: 'Y', frequency: 26 },
         { letter: 'Z', frequency: 2 }
       ]
-      frequencySum = chars.reduce((prev, current) => {
-        return { frequency: prev.frequency + current.frequency }
+      frequencySum = 0
+      frequencyMax = 0
+      chars.forEach(char => {
+        frequencySum += char.frequency
+        if (char.frequency > frequencyMax) {
+          frequencyMax = char.frequency
+        }
+        char.point_value = Math.max(1, Math.ceil((frequencyMax - char.frequency) / 10 + 1) - 2)
       })
+      console.log(chars)
       cardDeck = document.getElementById('card-deck')
       cards = Array.from(document.getElementsByClassName('placeholder'))
       team1 = true
       cardDeck.onclick = () => {
-        if (!cardDeck.innerHTML) {
+        if (!cardDeck.children[0].innerHTML) {
           team1 = !team1
           activeTeam = document.getElementById(team1 ? 'team-1' : 'team-2')
           inactiveTeam = document.getElementById(team1 ? 'team-2' : 'team-1')
           activeTeam.classList.add('active')
           inactiveTeam.classList.remove('active')
-          randomIndex = Math.ceil(Math.random() * frequencySum.frequency)
+          randomIndex = Math.ceil(Math.random() * frequencySum)
           tempSum = 0
           tempChar = ''
           chars.forEach(char => {
             tempSum += char.frequency
             if (tempSum >= randomIndex && !tempChar) {
-              tempChar = char.letter
+              tempChar = char
             }
           })
-          cardDeck.innerHTML = tempChar
+          cardDeck.children[0].innerHTML = tempChar.letter
+          cardDeck.children[1].innerHTML = tempChar.point_value
         }
       }
       cards.forEach(card => {
         card.onclick = () => {
-          if (cardDeck.innerHTML && card.parentNode.classList.contains('active')) {
-            card.innerHTML = cardDeck.innerHTML
-            cardDeck.innerHTML = ''
+          if (cardDeck.children[0].innerHTML && card.parentNode.classList.contains('active')) {
+            card.children[0].innerHTML = cardDeck.children[0].innerHTML // letter
+            card.children[1].innerHTML = chars.find(c => {
+              return c.letter === cardDeck.children[0].innerHTML
+            }).point_value // point value
+            cardDeck.children[0].innerHTML = ''
+            cardDeck.children[1].innerHTML = ''
             index = Array.from(card.parentNode.children).indexOf(card)
             row = Math.floor(index / 5)
             rowElements = Array.from(card.parentNode.children).slice(row * 5, row * 5 + 5)
             rowText = ''
             rowElements.forEach(el => {
-              rowText = rowText.concat(el.innerHTML)
+              rowText = rowText.concat(el.children[0].innerHTML)
             })
 
             if (rowText.length === 5) {

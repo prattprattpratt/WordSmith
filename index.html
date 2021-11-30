@@ -1,30 +1,48 @@
 <html>
   <head>
     <style>
-      .board {
+      .game {
         display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
       }
-      .container {
-        flex: 5;
+      .hand-container {
+        height: 160px;
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+      }
+      .player-hand.active {
+        background: #eee;
+      }
+      .play-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .play-side {
         display: flex;
         flex-wrap: wrap;
+        min-width: 620px;
+        max-width: 620px;
       }
-      .container.active {
-        background: #f4f4f4;
+      .play-side.active {
+        background: #eee;
       }
       #team-2 {
         justify-content: end;
       }
       .gap {
-        flex: 1;
         display: flex;
         flex-direction: column;
         align-items: center;
+        max-width: 120px;
       }
       .card {
         position: relative;
-        width: 120px;
-        height: 200px;
+        width: 100px;
+        height: 140px;
         margin: 8px;
         border: solid 5px #ccc;
         display: inline-flex;
@@ -34,10 +52,13 @@
         font-size: 60px;
         box-sizing: border-box;
       }
-      .valid {
+      .card.active {
+        border-color: #3157d5
+      }
+      .card.valid {
         border-color: #31d589
       }
-      .invalid {
+      .card.invalid {
         border-color: #f04a38;
       }
       .point-value {
@@ -49,58 +70,63 @@
     </style>
   </head>
   <body>
-    <div class="board">
-      <div id="team-1" class="container">
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
+    <div class="game">
+      <div class="hand-container top"></div>
+      <div class="play-container">
+        <div id="team-1" class="play-side active">
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+        </div>
+        <div class="gap">
+          <h1 id="valid-word"></h1>
+          <p id="valid-word-definition"></p>
+        </div>
+        <div id="team-2" class="play-side">
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+          <div class="card board"><div class="letter"></div><div class="point-value"></div></div>
+        </div>
       </div>
-      <div class="gap">
-        <div class="card" id="card-deck"><div class="letter"></div><div class="point-value"></div></div>
-        <h1 id="valid-word"></h1>
-        <p id="valid-word-definition"></p>
-      </div>
-      <div id="team-2" class="container">
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-        <div class="card placeholder"><div class="letter"></div><div class="point-value"></div></div>
-      </div>
+      <div class="hand-container bottom"></div>
     </div>
   </body>
   <script>
     window.onload = () => {
-      const httpGet = (url) => {
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open("GET", url, false); // false for synchronous request
-        xmlHttp.send(null);
-        return xmlHttp.responseText;
-      }
-
-      chars = [
+      validWordElement = document.getElementById('valid-word')
+      validWordDefinitionElement = document.getElementById('valid-word-definition')
+      numberOfPlayers = undefined
+      numberOfTeams = 2
+      numberOfCardsInHand = undefined
+      activePlayer = 0
+      activeTeam = 0
+      validWord = ''
+      validWordDefinition = ''
+      LETTERS = [
         { letter: 'A', frequency: 85 },
         { letter: 'B', frequency: 27 },
         { letter: 'C', frequency: 49 },
@@ -130,67 +156,149 @@
       ]
       frequencySum = 0
       frequencyMax = 0
-      chars.forEach(char => {
-        frequencySum += char.frequency
-        if (char.frequency > frequencyMax) {
-          frequencyMax = char.frequency
+      const httpGet = (url) => {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("GET", url, false);
+        xmlHttp.send(null);
+        return xmlHttp.responseText;
+      }
+      const promptForNumberPlayersAndCards = () => {
+        while (!numberOfPlayers) {
+          numberOfPlayers = Number(window.prompt('How many players are playing?', '4'))
         }
-        char.point_value = Math.max(1, Math.ceil((frequencyMax - char.frequency) / 10 + 1) - 2)
-      })
-      console.log(chars)
-      cardDeck = document.getElementById('card-deck')
-      cards = Array.from(document.getElementsByClassName('placeholder'))
-      team1 = true
-      cardDeck.onclick = () => {
-        if (!cardDeck.children[0].innerHTML) {
-          team1 = !team1
-          activeTeam = document.getElementById(team1 ? 'team-1' : 'team-2')
-          inactiveTeam = document.getElementById(team1 ? 'team-2' : 'team-1')
-          activeTeam.classList.add('active')
-          inactiveTeam.classList.remove('active')
-          randomIndex = Math.ceil(Math.random() * frequencySum)
-          tempSum = 0
-          tempChar = ''
-          chars.forEach(char => {
-            tempSum += char.frequency
-            if (tempSum >= randomIndex && !tempChar) {
-              tempChar = char
-            }
-          })
-          cardDeck.children[0].innerHTML = tempChar.letter
-          cardDeck.children[1].innerHTML = tempChar.point_value
+        while (!numberOfCardsInHand) {
+          numberOfCardsInHand = Number(window.prompt('How many cards per hand?', '3'))
         }
       }
-      cards.forEach(card => {
-        card.onclick = () => {
-          if (cardDeck.children[0].innerHTML && card.parentNode.classList.contains('active')) {
-            card.children[0].innerHTML = cardDeck.children[0].innerHTML // letter
-            card.children[1].innerHTML = chars.find(c => {
-              return c.letter === cardDeck.children[0].innerHTML
-            }).point_value // point value
-            cardDeck.children[0].innerHTML = ''
-            cardDeck.children[1].innerHTML = ''
-            index = Array.from(card.parentNode.children).indexOf(card)
-            row = Math.floor(index / 5)
-            rowElements = Array.from(card.parentNode.children).slice(row * 5, row * 5 + 5)
-            rowText = ''
-            rowElements.forEach(el => {
-              rowText = rowText.concat(el.children[0].innerHTML)
-            })
+      const setupHands = () => {
+        for (let i = 0; i < numberOfPlayers; i++) {
+          handElement = document.createElement('div')
+          handElement.classList.add('player-hand')
+          if (i === 0) {
+            handElement.classList.add('active')
+          }
+          for (let j = 0; j < numberOfCardsInHand; j++) {
+            handCardElement = document.createElement('div')
+            handCardElement.classList.add('card', 'hand')
+            letterElement = document.createElement('div')
+            letterElement.classList.add('letter')
+            pointValueElement = document.createElement('div')
+            pointValueElement.classList.add('point-value')
+            handCardElement.appendChild(letterElement)
+            handCardElement.appendChild(pointValueElement)
+            handElement.appendChild(handCardElement)
+          }
+          nthHandContainer = (i % 2) ? 1 : 0
+          document.getElementsByClassName('hand-container')[nthHandContainer].appendChild(handElement)
+        }
+      }
+      const calculatePointValues = () => {
+        LETTERS.forEach(char => {
+          frequencySum += char.frequency
+          if (char.frequency > frequencyMax) {
+            frequencyMax = char.frequency
+          }
+          char.point_value = Math.max(1, Math.ceil((frequencyMax - char.frequency) / 10 + 1) - 2)
+        })
+      }
+      const incrementTurn = () => {
+        activePlayer = (activePlayer + 1) % numberOfPlayers
+        activeTeam = (activeTeam + 1) % numberOfTeams
 
-            if (rowText.length === 5) {
-              word = rowText
-              response = JSON.parse(httpGet(`https://dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=f9144e92-9061-4ab5-b46d-f4d37b23f330`))
-              isValid = typeof response[0] === 'object'
-              rowElements.forEach(el => {
-                el.classList.add(isValid ? 'valid' : 'invalid')
-                el.classList.remove(isValid ? 'invalid' : 'valid')
-              })
+        activeTeamElement = document.getElementById(activeTeam ? 'team-2' : 'team-1')
+        inactiveTeamElement = document.getElementById(activeTeam ? 'team-1' : 'team-2')
+        activeTeamElement.classList.add('active')
+        inactiveTeamElement.classList.remove('active')
+
+        activePlayerElement = document.getElementsByClassName('player-hand active')[0]
+        nextPlayerElement = document.getElementsByClassName('player-hand')[activePlayer]
+        activePlayerElement.classList.remove('active')
+        nextPlayerElement.classList.add('active')
+      }
+      const chooseRandomLetter = (card) => {
+        randomIndex = Math.ceil(Math.random() * frequencySum)
+        tempSum = 0
+        letter = false
+        LETTERS.forEach(l => {
+          tempSum += l.frequency
+          if (tempSum >= randomIndex && !letter) {
+            letter = l
+          }
+        })
+
+        card.classList.remove('active')
+        card.children[0].innerHTML = letter.letter
+        card.children[1].innerHTML = letter.point_value
+      }
+      const placeCard = (boardCard, handCard) => {
+        boardCard.innerHTML = handCard.innerHTML
+        chooseRandomLetter(handCard)
+        incrementTurn()
+      }
+      const getRowText = (card) => {
+        index = Array.from(card.parentNode.children).indexOf(card)
+        row = Math.floor(index / 5)
+        rowElements = Array.from(card.parentNode.children).slice(row * 5, row * 5 + 5)
+        rowText = ''
+        rowElements.forEach(el => {
+          rowText = rowText.concat(el.children[0].innerHTML)
+        })
+
+        return {
+          word: rowText,
+          rowElements
+        }
+      }
+      const checkWordValidity = (word) => {
+        response = JSON.parse(httpGet(`https://dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=f9144e92-9061-4ab5-b46d-f4d37b23f330`))
+        isValid = typeof response[0] === 'object'
+        validWordDefinition = isValid ? response[0].shortdef[0] : ''
+
+        return isValid
+      }
+      const setRowValidity = (rowElements, isValid) => {
+        rowElements.forEach(el => {
+          el.classList.add(isValid ? 'valid' : 'invalid')
+          el.classList.remove(isValid ? 'invalid' : 'valid')
+        })
+      }
+      const setDefinition = (word) => {
+        validWordElement.innerHTML = word
+        validWordDefinitionElement.innerHTML = validWordDefinition
+      }
+
+      
+      calculatePointValues()
+      promptForNumberPlayersAndCards()
+      setupHands()
+
+      boardCards = Array.from(document.getElementsByClassName('card board'))
+      handCards = Array.from(document.getElementsByClassName('card hand'))
+      handCards.forEach(card => {
+        chooseRandomLetter(card)
+        card.onclick = () => {
+          if (card.parentNode.classList.contains('active')) {
+            Array.from(card.parentNode.children).forEach(c => {
+              c.classList.remove('active')
+            })
+            card.classList.add('active')
+          }
+        }
+      })
+      boardCards.forEach(card => {
+        card.onclick = () => {
+          isCorrectTurn = card.parentNode.classList.contains('active')
+          selectedHandCard = document.getElementsByClassName('card hand active')[0]
+          if (isCorrectTurn && selectedHandCard) {
+            placeCard(card, selectedHandCard)
+            const { word, rowElements } = getRowText(card)
+
+            if (word.length === 5) {
+              isValid = checkWordValidity(word)
+              setRowValidity(rowElements, isValid)
 
               if (isValid) {
-                definition = response[0].shortdef[0]
-                document.getElementById('valid-word').innerHTML = word
-                document.getElementById('valid-word-definition').innerHTML = definition
+                setDefinition(word)
               }
             }
           }

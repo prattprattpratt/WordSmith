@@ -70,6 +70,8 @@
     </style>
   </head>
   <body>
+    <label>Number of players:</label><input value=4 type="number" id="number-of-players" />
+    <label>Number of cards in hand:</label><input value=3 type="number" id="number-of-cards-in-hand" />
     <div class="game">
       <div class="hand-container top"></div>
       <div class="play-container">
@@ -117,11 +119,15 @@
   </body>
   <script>
     window.onload = () => {
+      boardCards = Array.from(document.getElementsByClassName('card board'))
+      handContainerElements = Array.from(document.getElementsByClassName('hand-container'))
       validWordElement = document.getElementById('valid-word')
       validWordDefinitionElement = document.getElementById('valid-word-definition')
-      numberOfPlayers = undefined
+      numberOfPlayersInput = document.getElementById('number-of-players')
+      numberOfCardsInHandInput = document.getElementById('number-of-cards-in-hand')
+      numberOfPlayers = 4
       numberOfTeams = 2
-      numberOfCardsInHand = undefined
+      numberOfCardsInHand = 3
       activePlayer = 0
       activeTeam = 0
       validWord = ''
@@ -162,15 +168,13 @@
         xmlHttp.send(null);
         return xmlHttp.responseText;
       }
-      const promptForNumberPlayersAndCards = () => {
-        while (!numberOfPlayers) {
-          numberOfPlayers = Number(window.prompt('How many players are playing?', '4'))
-        }
-        while (!numberOfCardsInHand) {
-          numberOfCardsInHand = Number(window.prompt('How many cards per hand?', '3'))
-        }
-      }
       const setupHands = () => {
+        handContainerElements.forEach(e => {
+          e.innerHTML = null
+        })
+        boardCards.forEach(c => {
+          c.innerHTML = null
+        })
         for (let i = 0; i < numberOfPlayers; i++) {
           handElement = document.createElement('div')
           handElement.classList.add('player-hand')
@@ -192,6 +196,14 @@
           document.getElementsByClassName('hand-container')[nthHandContainer].appendChild(handElement)
         }
       }
+      numberOfPlayersInput.addEventListener('change', e => {
+        numberOfPlayers = e.target.value
+        resetBoard()
+      })
+      numberOfCardsInHandInput.addEventListener('change', e => {
+        numberOfCardsInHand = e.target.value
+        resetBoard()
+      })
       const calculatePointValues = () => {
         LETTERS.forEach(char => {
           frequencySum += char.frequency
@@ -267,16 +279,13 @@
         validWordDefinitionElement.innerHTML = validWordDefinition
       }
 
-      
       calculatePointValues()
-      promptForNumberPlayersAndCards()
-      setupHands()
-
-      boardCards = Array.from(document.getElementsByClassName('card board'))
-      handCards = Array.from(document.getElementsByClassName('card hand'))
-      handCards.forEach(card => {
-        chooseRandomLetter(card)
-        card.onclick = () => {
+      const resetBoard = () => {
+        setupHands()
+        handCards = Array.from(document.getElementsByClassName('card hand'))
+        handCards.forEach(card => {
+          chooseRandomLetter(card)
+          card.onclick = () => {
           if (card.parentNode.classList.contains('active')) {
             Array.from(card.parentNode.children).forEach(c => {
               c.classList.remove('active')
@@ -284,7 +293,10 @@
             card.classList.add('active')
           }
         }
-      })
+        })
+      }
+      resetBoard()
+
       boardCards.forEach(card => {
         card.onclick = () => {
           isCorrectTurn = card.parentNode.classList.contains('active')

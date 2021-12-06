@@ -13,6 +13,9 @@
         justify-content: space-around;
         width: 100%;
       }
+      .player-hand {
+        display: flex;
+      }
       .player-hand.active {
         background: #eee;
       }
@@ -134,35 +137,33 @@
       validWord = ''
       validWordDefinition = ''
       LETTERS = [
-        { letter: 'A', frequency: 85 },
-        { letter: 'B', frequency: 27 },
-        { letter: 'C', frequency: 49 },
-        { letter: 'D', frequency: 33 },
-        { letter: 'E', frequency: 109 },
-        { letter: 'F', frequency: 18 },
-        { letter: 'G', frequency: 26 },
-        { letter: 'H', frequency: 39 },
-        { letter: 'I', frequency: 55 },
-        { letter: 'J', frequency: 2 },
-        { letter: 'K', frequency: 14 },
-        { letter: 'L', frequency: 62 },
-        { letter: 'M', frequency: 28 },
-        { letter: 'N', frequency: 51 },
-        { letter: 'O', frequency: 72 },
-        { letter: 'P', frequency: 26 },
-        { letter: 'Q', frequency: 2 },
-        { letter: 'R', frequency: 84 },
-        { letter: 'S', frequency: 59 },
-        { letter: 'T', frequency: 67 },
-        { letter: 'U', frequency: 34 },
-        { letter: 'V', frequency: 11 },
-        { letter: 'W', frequency: 14 },
-        { letter: 'X', frequency: 2 },
-        { letter: 'Y', frequency: 26 },
-        { letter: 'Z', frequency: 2 }
+        { letter: 'A', frequency: 9, point_value: 1 },
+        { letter: 'B', frequency: 2, point_value: 3 },
+        { letter: 'C', frequency: 2, point_value: 3 },
+        { letter: 'D', frequency: 5, point_value: 2 },
+        { letter: 'E', frequency: 12, point_value: 1 },
+        { letter: 'F', frequency: 2, point_value: 4 },
+        { letter: 'G', frequency: 3, point_value: 2 },
+        { letter: 'H', frequency: 2, point_value: 4 },
+        { letter: 'I', frequency: 9, point_value: 1 },
+        { letter: 'J', frequency: 1, point_value: 8 },
+        { letter: 'K', frequency: 1, point_value: 5 },
+        { letter: 'L', frequency: 4, point_value: 1 },
+        { letter: 'M', frequency: 2, point_value: 3 },
+        { letter: 'N', frequency: 6, point_value: 1 },
+        { letter: 'O', frequency: 8, point_value: 1 },
+        { letter: 'P', frequency: 2, point_value: 3 },
+        { letter: 'Q', frequency: 1, point_value: 10 },
+        { letter: 'R', frequency: 6, point_value: 1 },
+        { letter: 'S', frequency: 5, point_value: 1 },
+        { letter: 'T', frequency: 6, point_value: 1 },
+        { letter: 'U', frequency: 4, point_value: 1 },
+        { letter: 'V', frequency: 2, point_value: 4 },
+        { letter: 'W', frequency: 2, point_value: 4 },
+        { letter: 'X', frequency: 1, point_value: 8 },
+        { letter: 'Y', frequency: 2, point_value: 4 },
+        { letter: 'Z', frequency: 1, point_value: 10 }
       ]
-      frequencySum = 0
-      frequencyMax = 0
       const httpGet = (url) => {
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.open("GET", url, false);
@@ -207,15 +208,6 @@
         numberOfCardsInHand = e.target.value
         resetBoard()
       })
-      const calculatePointValues = () => {
-        LETTERS.forEach(char => {
-          frequencySum += char.frequency
-          if (char.frequency > frequencyMax) {
-            frequencyMax = char.frequency
-          }
-          char.point_value = Math.max(1, Math.ceil((frequencyMax - char.frequency) / 10 + 1) - 2)
-        })
-      }
       const incrementTurn = () => {
         activePlayer = (activePlayer + 1) % numberOfPlayers
         activeTeam = (activeTeam + 1) % numberOfTeams
@@ -231,19 +223,26 @@
         nextPlayerElement.classList.add('active')
       }
       const chooseRandomLetter = (card) => {
+        frequencySum = 0
+        LETTERS.forEach(char => {
+          frequencySum += char.frequency
+        })
+        console.log(frequencySum)
         randomIndex = Math.ceil(Math.random() * frequencySum)
         tempSum = 0
         letter = false
         LETTERS.forEach(l => {
           tempSum += l.frequency
-          if (tempSum >= randomIndex && !letter) {
+          if (tempSum >= randomIndex && !letter && l.frequency > 0) {
             letter = l
+            l.frequency -= 1
+            console.log(l)
           }
         })
 
         card.classList.remove('active')
-        card.children[0].innerHTML = letter.letter
-        card.children[1].innerHTML = letter.point_value
+        card.children[0].innerHTML = letter?.letter || ''
+        card.children[1].innerHTML = letter?.point_value || ''
       }
       const placeCard = (boardCard, handCard) => {
         boardCard.innerHTML = handCard.innerHTML
@@ -282,7 +281,6 @@
         validWordDefinitionElement.innerHTML = validWordDefinition
       }
 
-      calculatePointValues()
       const resetBoard = () => {
         setupHands()
         handCards = Array.from(document.getElementsByClassName('card hand'))
@@ -290,7 +288,7 @@
         handCards.forEach(card => {
           chooseRandomLetter(card)
           card.onclick = () => {
-            if (card.parentNode.classList.contains('active')) {
+            if (card.parentNode.classList.contains('active') && card.children[0].innerHTML) {
               Array.from(card.parentNode.children).forEach(c => {
                 c.classList.remove('active')
               })

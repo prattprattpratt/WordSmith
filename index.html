@@ -73,7 +73,7 @@
     </style>
   </head>
   <body>
-    <label>Number of players:</label><input value=4 type="number" id="number-of-players" />
+    <label>Number of players:</label><input step=2 value=4 type="number" id="number-of-players" />
     <label>Number of cards in hand:</label><input value=3 type="number" id="number-of-cards-in-hand" />
     <div class="game">
       <div class="hand-container top"></div>
@@ -201,8 +201,10 @@
         }
       }
       numberOfPlayersInput.addEventListener('change', e => {
-        numberOfPlayers = e.target.value
-        resetBoard()
+        if (e.target.value && e.target.value % 2 === 0) {
+          numberOfPlayers = e.target.value
+          resetBoard()
+        }
       })
       numberOfCardsInHandInput.addEventListener('change', e => {
         numberOfCardsInHand = e.target.value

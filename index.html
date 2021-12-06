@@ -119,6 +119,7 @@
   </body>
   <script>
     window.onload = () => {
+      playSides = Array.from(document.getElementsByClassName('play-side'))
       boardCards = Array.from(document.getElementsByClassName('card board'))
       handContainerElements = Array.from(document.getElementsByClassName('hand-container'))
       validWordElement = document.getElementById('valid-word')
@@ -173,7 +174,9 @@
           e.innerHTML = null
         })
         boardCards.forEach(c => {
-          c.innerHTML = null
+          Array.from(c.children).forEach(c => {
+            c.innerHTML = null
+          })
         })
         for (let i = 0; i < numberOfPlayers; i++) {
           handElement = document.createElement('div')
@@ -283,39 +286,44 @@
       const resetBoard = () => {
         setupHands()
         handCards = Array.from(document.getElementsByClassName('card hand'))
+        boardCards = Array.from(document.getElementsByClassName('card board'))
         handCards.forEach(card => {
           chooseRandomLetter(card)
           card.onclick = () => {
-          if (card.parentNode.classList.contains('active')) {
-            Array.from(card.parentNode.children).forEach(c => {
-              c.classList.remove('active')
-            })
-            card.classList.add('active')
+            if (card.parentNode.classList.contains('active')) {
+              Array.from(card.parentNode.children).forEach(c => {
+                c.classList.remove('active')
+              })
+              card.classList.add('active')
+            }
           }
-        }
         })
-      }
-      resetBoard()
+        boardCards.forEach(card => {
+          card.onclick = () => {
+            isCorrectTurn = card.parentNode.classList.contains('active')
+            selectedHandCard = document.getElementsByClassName('card hand active')[0]
+            if (isCorrectTurn && selectedHandCard) {
+              placeCard(card, selectedHandCard)
+              const { word, rowElements } = getRowText(card)
 
-      boardCards.forEach(card => {
-        card.onclick = () => {
-          isCorrectTurn = card.parentNode.classList.contains('active')
-          selectedHandCard = document.getElementsByClassName('card hand active')[0]
-          if (isCorrectTurn && selectedHandCard) {
-            placeCard(card, selectedHandCard)
-            const { word, rowElements } = getRowText(card)
+              if (word.length === 5) {
+                isValid = checkWordValidity(word)
+                setRowValidity(rowElements, isValid)
 
-            if (word.length === 5) {
-              isValid = checkWordValidity(word)
-              setRowValidity(rowElements, isValid)
-
-              if (isValid) {
-                setDefinition(word)
+                if (isValid) {
+                  setDefinition(word)
+                }
               }
             }
           }
-        }
-      })
+        })  
+
+        activePlayer = 0
+        activeTeam = 0
+        playSides[0].classList.add('active')
+        playSides[1].classList.remove('active')
+      }
+      resetBoard()
     }
   </script>
 </html>

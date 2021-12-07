@@ -229,7 +229,6 @@
         LETTERS.forEach(char => {
           frequencySum += char.frequency
         })
-        console.log(frequencySum)
         randomIndex = Math.ceil(Math.random() * frequencySum)
         tempSum = 0
         letter = false
@@ -238,7 +237,6 @@
           if (tempSum >= randomIndex && !letter && l.frequency > 0) {
             letter = l
             l.frequency -= 1
-            console.log(l)
           }
         })
 

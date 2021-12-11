@@ -73,8 +73,8 @@
     </style>
   </head>
   <body>
-    <label>Number of players:</label><input step=2 value=4 type="number" id="number-of-players" />
-    <label>Number of cards in hand:</label><input value=3 type="number" id="number-of-cards-in-hand" />
+    <label>Number of players:</label><input step=2 type="number" id="number-of-players" />
+    <label>Number of cards in hand:</label><input type="number" id="number-of-cards-in-hand" />
     <div class="game">
       <div class="hand-container top"></div>
       <div class="play-container">
@@ -129,13 +129,13 @@
       validWordDefinitionElement = document.getElementById('valid-word-definition')
       numberOfPlayersInput = document.getElementById('number-of-players')
       numberOfCardsInHandInput = document.getElementById('number-of-cards-in-hand')
-      numberOfPlayers = 4
       numberOfTeams = 2
-      numberOfCardsInHand = 3
       activePlayer = 0
       activeTeam = 0
       validWord = ''
       validWordDefinition = ''
+      NUMBER_OF_PLAYERS_KEY = 'numberOfPlayers'
+      NUMBER_OF_CARDS_IN_HAND_KEY = 'numberOfCardsInHand'
       ORIGINAL_LETTERS = [
         { letter: 'A', frequency: 9, point_value: 1 },
         { letter: 'B', frequency: 2, point_value: 3 },
@@ -171,6 +171,28 @@
         xmlHttp.send(null);
         return xmlHttp.responseText;
       }
+      const setNumberOfPlayers = (num) => {
+        localStorage.setItem(NUMBER_OF_PLAYERS_KEY, num)
+      }
+      const getNumberOfPlayers = () => {
+        num = localStorage.getItem(NUMBER_OF_PLAYERS_KEY)
+        if (!num) {
+          num = 4
+          setNumberOfPlayers(num)
+        }
+        return num
+      }
+      const setNumberOfCardsInHand = (num) => {
+        localStorage.setItem(NUMBER_OF_CARDS_IN_HAND_KEY, num)
+      }
+      const getNumberOfCardsInHand = () => {
+        num = localStorage.getItem(NUMBER_OF_CARDS_IN_HAND_KEY)
+        if (!num) {
+          num = 3
+          setNumberOfCardsInHand(num)
+        }
+        return num
+      }
       const setupHands = () => {
         handContainerElements.forEach(e => {
           e.innerHTML = null
@@ -180,13 +202,13 @@
             c.innerHTML = null
           })
         })
-        for (let i = 0; i < numberOfPlayers; i++) {
+        for (let i = 0; i < getNumberOfPlayers(); i++) {
           handElement = document.createElement('div')
           handElement.classList.add('player-hand')
           if (i === 0) {
             handElement.classList.add('active')
           }
-          for (let j = 0; j < numberOfCardsInHand; j++) {
+          for (let j = 0; j < getNumberOfCardsInHand(); j++) {
             handCardElement = document.createElement('div')
             handCardElement.classList.add('card', 'hand')
             letterElement = document.createElement('div')
@@ -200,19 +222,24 @@
           nthHandContainer = (i % 2) ? 1 : 0
           document.getElementsByClassName('hand-container')[nthHandContainer].appendChild(handElement)
         }
+
+        numberOfPlayersInput.value = getNumberOfPlayers()
+        numberOfCardsInHandInput.value = getNumberOfCardsInHand()
       }
       numberOfPlayersInput.addEventListener('change', e => {
-        if (e.target.value && e.target.value % 2 === 0) {
-          numberOfPlayers = e.target.value
+        num = e.target.value
+        if (num && num % 2 === 0) {
+          setNumberOfPlayers(num)
           resetBoard()
         }
       })
       numberOfCardsInHandInput.addEventListener('change', e => {
-        numberOfCardsInHand = e.target.value
+        num = e.target.value
+        setNumberOfCardsInHand(num)
         resetBoard()
       })
       const incrementTurn = () => {
-        activePlayer = (activePlayer + 1) % numberOfPlayers
+        activePlayer = (activePlayer + 1) % getNumberOfPlayers()
         activeTeam = (activeTeam + 1) % numberOfTeams
 
         activeTeamElement = document.getElementById(activeTeam ? 'team-2' : 'team-1')

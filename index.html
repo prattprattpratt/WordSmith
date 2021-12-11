@@ -70,6 +70,15 @@
         right: 8px;
         font-size: 16px;
       }
+      .google-sheets-letter-container {
+        margin: 10px;
+        display: flex;
+        justify-content: space-between;
+        width: 180px;
+      }
+      .google-sheets-letter-container input {
+        width: 40px;
+      }
     </style>
   </head>
   <body>
@@ -119,6 +128,10 @@
       </div>
       <div class="hand-container bottom"></div>
     </div>
+    <button id="get-google-sheets-data">Get Google Sheets Data</button>
+    <button id="update-on-this-computer">Update On This Computer</button>
+    <button id="update-in-google-sheets">Update In Google Sheets</button>
+    <div id="google-sheets-letters-container"></div>
   </body>
   <script>
     window.onload = () => {
@@ -129,6 +142,10 @@
       validWordDefinitionElement = document.getElementById('valid-word-definition')
       numberOfPlayersInput = document.getElementById('number-of-players')
       numberOfCardsInHandInput = document.getElementById('number-of-cards-in-hand')
+      getGoogleSheetDataButton = document.getElementById('get-google-sheets-data')
+      updateOnThisComputerButton = document.getElementById('update-on-this-computer')
+      updateInGoogleSheetsButton = document.getElementById('update-in-google-sheets')
+      googleSheetsLettersContainer = document.getElementById('google-sheets-letters-container')
       numberOfTeams = 2
       activePlayer = 0
       activeTeam = 0
@@ -136,6 +153,7 @@
       validWordDefinition = ''
       NUMBER_OF_PLAYERS_KEY = 'numberOfPlayers'
       NUMBER_OF_CARDS_IN_HAND_KEY = 'numberOfCardsInHand'
+      GOOGLE_SHEETS_LETTERS_KEY = 'googleSheetsLetters'
       ORIGINAL_LETTERS = [
         { letter: 'A', frequency: 9, point_value: 1 },
         { letter: 'B', frequency: 2, point_value: 3 },
@@ -238,6 +256,15 @@
         setNumberOfCardsInHand(num)
         resetBoard()
       })
+      getGoogleSheetDataButton.addEventListener('click', () => {
+        getGoogleSheetData()
+      })
+      updateOnThisComputerButton.addEventListener('click', () => {
+        updateLettersLocally()
+      })
+      updateInGoogleSheetsButton.addEventListener('click', () => {
+        updateLettersRemotely()
+      })
       const incrementTurn = () => {
         activePlayer = (activePlayer + 1) % getNumberOfPlayers()
         activeTeam = (activeTeam + 1) % numberOfTeams
@@ -307,6 +334,67 @@
       const setDefinition = (word) => {
         validWordElement.innerHTML = word
         validWordDefinitionElement.innerHTML = validWordDefinition
+      }
+      const getGoogleSheetData = () => {
+        letters = JSON.parse(localStorage.getItem(GOOGLE_SHEETS_LETTERS_KEY))
+        if (!letters) {
+          letters = JSON.parse(httpGet('https://sheets.googleapis.com/v4/spreadsheets/1oOqqvC7M6-1QptQOHYMdSbYF6ck9B6dBH1Ti6mn67GI/values/Scrabble?key=AIzaSyAeDaX2jPdYgDX7v9SOofwALTJlR4wkRYY')).values
+          localStorage.setItem(GOOGLE_SHEETS_LETTERS_KEY, JSON.stringify(letters))
+        }
+        if (letters.length === 27) { // make sure the data looks right - 26 letters + 1 header
+          googleSheetsLettersContainer.innerHTML = ''
+          letters.forEach((l, i) => {
+            letter = l[0]
+            frequency = l[1]
+            points = l[2]
+            
+            letterContainer = document.createElement('div')
+            letterContainer.classList.add('google-sheets-letter-container')
+            if (i === 0) { // header in Google Sheets
+              letterElement = document.createElement('span')
+              frequencyElement = document.createElement('span')
+              pointsElement = document.createElement('span')
+              letterElement.innerHTML = letter
+              frequencyElement.innerHTML = frequency
+              pointsElement.innerHTML = points
+            } else {
+              letterElement = document.createElement('span')
+              frequencyElement = document.createElement('input')
+              pointsElement = document.createElement('input')
+              letterElement.innerHTML = letter
+              frequencyElement.value = frequency
+              frequencyElement.type = 'number'
+              pointsElement.value = points
+              pointsElement.type = 'number'
+            }
+
+            letterContainer.appendChild(letterElement)
+            letterContainer.appendChild(frequencyElement)
+            letterContainer.appendChild(pointsElement)
+            googleSheetsLettersContainer.appendChild(letterContainer)
+          })
+        }
+      }
+      const updateLettersLocally = () => {
+        googleSheetsLetters = Array.from(document.getElementsByClassName('google-sheets-letter-container'))
+        if (googleSheetsLetters.length === 27) { // make sure the data looks right - 26 letters + 1 header
+          letters = []
+          googleSheetsLetters.forEach((l, i) => {
+            letter = l.children[0].innerHTML
+            if (i === 0) {
+              frequency = l.children[1].innerHTML
+              points = l.children[2].innerHTML
+            } else {
+              frequency = l.children[1].value
+              points = l.children[2].value
+            }
+
+            letters.push([letter, frequency, points])
+          })
+          localStorage.setItem(GOOGLE_SHEETS_LETTERS_KEY, JSON.stringify(letters))
+
+          resetBoard()
+        }
       }
 
       const resetBoard = () => {

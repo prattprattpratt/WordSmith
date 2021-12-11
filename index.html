@@ -136,7 +136,7 @@
       activeTeam = 0
       validWord = ''
       validWordDefinition = ''
-      LETTERS = [
+      ORIGINAL_LETTERS = [
         { letter: 'A', frequency: 9, point_value: 1 },
         { letter: 'B', frequency: 2, point_value: 3 },
         { letter: 'C', frequency: 2, point_value: 3 },
@@ -164,6 +164,7 @@
         { letter: 'Y', frequency: 2, point_value: 4 },
         { letter: 'Z', frequency: 1, point_value: 10 }
       ]
+      LETTERS = JSON.parse(JSON.stringify(ORIGINAL_LETTERS))
       const httpGet = (url) => {
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.open("GET", url, false);
@@ -282,6 +283,7 @@
       }
 
       const resetBoard = () => {
+        LETTERS = JSON.parse(JSON.stringify(ORIGINAL_LETTERS))
         setupHands()
         handCards = Array.from(document.getElementsByClassName('card hand'))
         boardCards = Array.from(document.getElementsByClassName('card board'))

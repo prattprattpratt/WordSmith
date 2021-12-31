@@ -133,8 +133,8 @@
   </body>
   <script>
     window.onload = () => {
-      playSides = Array.from(document.getElementsByClassName('play-side'))
-      boardCards = Array.from(document.getElementsByClassName('card board'))
+      playSidesElements = Array.from(document.getElementsByClassName('play-side'))
+      boardCardsElements = Array.from(document.getElementsByClassName('card board'))
       handContainerElements = Array.from(document.getElementsByClassName('hand-container'))
       validWordElement = document.getElementById('valid-word')
       validWordDefinitionElement = document.getElementById('valid-word-definition')
@@ -145,12 +145,9 @@
       numberOfTeams = 2
       activePlayer = 0
       activeTeam = 0
-      validWord = ''
-      validWordDefinition = ''
       LETTERS_KEY = 'letters'
       NUMBER_OF_PLAYERS_KEY = 'numberOfPlayers'
       NUMBER_OF_CARDS_IN_HAND_KEY = 'numberOfCardsInHand'
-      GOOGLE_SHEETS_LETTERS_KEY = 'googleSheetsLetters'
       const httpGet = (url) => {
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.open("GET", url, false);
@@ -160,9 +157,9 @@
       const setLetters = (letters) => {
         localStorage.setItem(LETTERS_KEY, JSON.stringify(letters))
       }
-      const getLetters = () => {
+      const getLetters = (reset) => {
         letters = localStorage.getItem(LETTERS_KEY)
-        if (!letters) {
+        if (!letters || reset) {
           getGoogleSheetData()
         }
         letters = localStorage.getItem(LETTERS_KEY)
@@ -193,15 +190,19 @@
         }
         return num
       }
-      const setupHands = () => {
+      const clearHands = () => {
         handContainerElements.forEach(e => {
           e.innerHTML = null
         })
-        boardCards.forEach(c => {
+      }
+      const clearBoard = () => {
+        boardCardsElements.forEach(c => {
           Array.from(c.children).forEach(c => {
             c.innerHTML = null
           })
         })
+      }
+      const createHands = () => {
         for (let i = 0; i < getNumberOfPlayers(); i++) {
           handElement = document.createElement('div')
           handElement.classList.add('player-hand')
@@ -222,9 +223,15 @@
           nthHandContainer = (i % 2) ? 1 : 0
           document.getElementsByClassName('hand-container')[nthHandContainer].appendChild(handElement)
         }
-
+      }
+      const resetNumberOfPlayersAndCardsInputs = () => {
         numberOfPlayersInput.value = getNumberOfPlayers()
         numberOfCardsInHandInput.value = getNumberOfCardsInHand()
+      }
+      const resetCards = () => {
+        clearHands()
+        clearBoard()
+        createHands()
       }
       numberOfPlayersInput.addEventListener('change', e => {
         num = e.target.value
@@ -273,7 +280,7 @@
         letter = false
         letters.forEach((l, i) => {
           if (i > 0) {
-            tempSum += l[1]
+            tempSum += Number(l[1])
             if (tempSum >= randomIndex && !letter && l[1] > 0) {
               letter = l
               l[1] -= 1
@@ -305,12 +312,9 @@
           rowElements
         }
       }
-      const checkWordValidity = (word) => {
+      const getDefinition = (word) => {
         response = JSON.parse(httpGet(`https://dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=f9144e92-9061-4ab5-b46d-f4d37b23f330`))
-        isValid = typeof response[0] === 'object'
-        validWordDefinition = isValid ? response[0].shortdef[0] : ''
-
-        return isValid
+        return response?.[0]?.shortdef?.[0]
       }
       const setRowValidity = (rowElements, isValid) => {
         rowElements.forEach(el => {
@@ -318,9 +322,9 @@
           el.classList.remove(isValid ? 'invalid' : 'valid')
         })
       }
-      const setDefinition = (word) => {
+      const setValidWordAndDefinitionUI = (word, definition) => {
         validWordElement.innerHTML = word
-        validWordDefinitionElement.innerHTML = validWordDefinition
+        validWordDefinitionElement.innerHTML = definition
       }
       const getGoogleSheetData = (sheetName) => {
         sheetName ||= 'Scrabble'
@@ -334,10 +338,11 @@
         }
       }
       const resetBoard = () => {
-        setLetters(getLetters())
-        setupHands()
+        setLetters(getLetters(true))
+        resetCards()
+        resetNumberOfPlayersAndCardsInputs()
         handCards = Array.from(document.getElementsByClassName('card hand'))
-        boardCards = Array.from(document.getElementsByClassName('card board'))
+        boardCardsElements = Array.from(document.getElementsByClassName('card board'))
         handCards.forEach(card => {
           chooseRandomLetter(card)
           card.onclick = () => {
@@ -349,7 +354,7 @@
             }
           }
         })
-        boardCards.forEach(card => {
+        boardCardsElements.forEach(card => {
           card.onclick = () => {
             isCorrectTurn = card.parentNode.classList.contains('active')
             selectedHandCard = document.getElementsByClassName('card hand active')[0]
@@ -358,11 +363,11 @@
               const { word, rowElements } = getRowText(card)
 
               if (word.length === 5) {
-                isValid = checkWordValidity(word)
-                setRowValidity(rowElements, isValid)
+                definition = getDefinition(word)
+                setRowValidity(rowElements, definition)
 
-                if (isValid) {
-                  setDefinition(word)
+                if (definition) {
+                  setValidWordAndDefinitionUI(word, definition)
                 }
               }
             }
@@ -371,8 +376,8 @@
 
         activePlayer = 0
         activeTeam = 0
-        playSides[0].classList.add('active')
-        playSides[1].classList.remove('active')
+        playSidesElements[0].classList.add('active')
+        playSidesElements[1].classList.remove('active')
       }
       resetBoard()
     }

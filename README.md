@@ -1,2 +1,2 @@
-# 5-letter Game (name TBD)
-[5lettergame.surge.sh](https://5lettergame.surge.sh)
+# WordSmith Game
+[wordsmithgame.netlify.app](wordsmithgame.netlify.app)

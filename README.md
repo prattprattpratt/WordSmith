@@ -1,2 +1,2 @@
 # WordSmith Game
-[wordsmithgame.netlify.app](wordsmithgame.netlify.app)
+[thewordsmithgame.netlify.app](thewordsmithgame.netlify.app)
